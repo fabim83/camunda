@@ -1,4 +1,4 @@
-package de.adesso.camunda.configuration;
+package de.adesso.camunda.configuration.keycloak;
 
 import org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin;
 import org.springframework.boot.context.properties.ConfigurationProperties;

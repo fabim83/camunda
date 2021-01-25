@@ -1,6 +1,7 @@
 HELP.md
 target/
 .mvn
+camunda-db.mv.db
 !**/src/main/**/target/
 !**/src/test/**/target/
 
