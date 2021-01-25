@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <bpmn:collaboration id="Collaboration_Eingangsprozess">
+    <bpmn:participant id="Participant_Eingangsprozess" name="Eingangsprozess" processRef="Process_Eingangsprozess" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Eingangsprozess" isExecutable="true" camunda:historyTimeToLive="365">
+    <bpmn:startEvent id="StartEvent_Eingangsprozess" name="Start Eingangsprozess" camunda:asyncBefore="true">
+      <bpmn:extensionElements>
+        <camunda:formData businessKey="businesskey">
+          <camunda:formField id="einzelnachrichtID" label="einzelnachrichtID" type="string" />
+          <camunda:formField id="businesskey" label="businesskey" type="string" />
+          <camunda:formField id="mitgegebeneSchadennummer" label="Schadennummer" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>SequenceFlow_0o7gfjb</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:dataStoreReference id="DataStoreReference_EinzelnachrichtenArchiv" name="GDV-Einzel-Nachrichten Archiv&#10;(PR.TSPT020N)" />
+    <bpmn:businessRuleTask id="Task_EingangsprozessAussteuerungNachrichtentypPruefen" name="Aussteuerung Nachrichtentyp prüfen" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:resultVariable="nachrichtenTypAussteuern" camunda:decisionRef="eingangsprozessAussteuerungNachrichtentypPruefen" camunda:mapDecisionResult="singleEntry">
+      <bpmn:documentation>GdvNachrichtentypErmittlung</bpmn:documentation>
+      <bpmn:incoming>SequenceFlow_1hx77go</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_108fyfu</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_NachrichtentypAussteuern" name="Auszusteuernder Nachrichtentyp?">
+      <bpmn:incoming>SequenceFlow_108fyfu</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_NachrichtenTypAussteuernJa</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_NachrichtenTypAussteuernNein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_QuittungsverarbeitungAufrufen" name="Quittung?">
+      <bpmn:incoming>SequenceFlow_NachrichtenTypAussteuernNein</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_QuittungsverarbeitungAufrufenNein</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_QuittungsverarbeitungAufrufenJa</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1c807f0" name="Fehlermeldung?">
+      <bpmn:incoming>SequenceFlow_QuittungsverarbeitungAufrufenNein</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_12m4tre</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0dd39jy</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="Task_EingangsprozessAnhaengeArchivieren" name="Anhänge archivieren" camunda:asyncBefore="true" camunda:asyncAfter="true" calledElement="Process_AnhaengeArchivieren" camunda:variableMappingDelegateExpression="#{delegateProzessVariablenUebergabe}">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_12m4tre</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0v0kcck</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_OrdnungstypValide" name="Ordnungstyp valide?">
+      <bpmn:incoming>SequenceFlow_0v0kcck</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_07bxq1o</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0waunhn</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_OrdnungstypArt">
+      <bpmn:incoming>SequenceFlow_07bxq1o</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_OrdnungstypArtVNR</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_OrdnungstypArtSNR</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="Task_EingangsprozessSchadenErfassen" name="Schaden erfassen" camunda:asyncBefore="true" camunda:asyncAfter="true" calledElement="Process_Schadenerfassung" camunda:variableMappingDelegateExpression="#{delegateProzessVariablenUebergabe}">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_OrdnungstypArtVNR</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1n8gsgq</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:serviceTask id="Task_EingangsprozessDokumenteZuSnrBekanntgeben" name="Dokumente zu SNR bekanntgeben" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateEingangsprozessDokumenteZuSnrBekanntgeben}">
+      <bpmn:incoming>SequenceFlow_1n8gsgq</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_11pj7vj</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0o0cgz7">
+      <bpmn:incoming>SequenceFlow_OrdnungstypArtSNR</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_11pj7vj</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0yde6jg</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0xs8738">
+      <bpmn:incoming>SequenceFlow_0waunhn</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1vumses</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1p9no7p</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:boundaryEvent id="BoundaryEvent_0y7b48v" name="Keine Schadenmeldung" attachedToRef="Task_EingangsprozessSchadenErfassen">
+      <bpmn:outgoing>SequenceFlow_1vumses</bpmn:outgoing>
+      <bpmn:escalationEventDefinition escalationRef="Escalation_0dznoyv" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="BoundaryEvent_FehlerSchadenerfassung" name="Schaden nicht erfassbar" attachedToRef="Task_EingangsprozessSchadenErfassen">
+      <bpmn:outgoing>SequenceFlow_0rs6dzp</bpmn:outgoing>
+      <bpmn:escalationEventDefinition escalationRef="Escalation_1cuzjcv" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_OrdnungstypArtSNR" name="SNR" sourceRef="ExclusiveGateway_OrdnungstypArt" targetRef="ExclusiveGateway_0o0cgz7">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ordnungstyp == "SNR"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0o7gfjb" sourceRef="StartEvent_Eingangsprozess" targetRef="Task_EingangsprozessMetadatenErmitteln" />
+    <bpmn:sequenceFlow id="SequenceFlow_1hx77go" sourceRef="Task_EingangsprozessMetadatenErmitteln" targetRef="Task_EingangsprozessAussteuerungNachrichtentypPruefen" />
+    <bpmn:sequenceFlow id="SequenceFlow_108fyfu" sourceRef="Task_EingangsprozessAussteuerungNachrichtentypPruefen" targetRef="ExclusiveGateway_NachrichtentypAussteuern" />
+    <bpmn:sequenceFlow id="SequenceFlow_NachrichtenTypAussteuernJa" name="Ja" sourceRef="ExclusiveGateway_NachrichtentypAussteuern" targetRef="EndEvent_EingangsprozessNachrichtentypAusgesteuert">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nachrichtenTypAussteuern}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_NachrichtenTypAussteuernNein" name="Nein" sourceRef="ExclusiveGateway_NachrichtentypAussteuern" targetRef="ExclusiveGateway_QuittungsverarbeitungAufrufen">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${not nachrichtenTypAussteuern}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_QuittungsverarbeitungAufrufenJa" name="Ja" sourceRef="ExclusiveGateway_QuittungsverarbeitungAufrufen" targetRef="Task_EingangsprozessQuittungsverarbeitungAufrufen">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${quittungsVerarbeitungAufrufen}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_QuittungsverarbeitungAufrufenNein" name="Nein" sourceRef="ExclusiveGateway_QuittungsverarbeitungAufrufen" targetRef="ExclusiveGateway_1c807f0">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${not quittungsVerarbeitungAufrufen}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0dd39jy" name="Ja" sourceRef="ExclusiveGateway_1c807f0" targetRef="Task_EingangsprozessMailFehlermeldungVerschicken">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${fehlermeldungVerarbeitungAufrufen}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_12m4tre" name="Nein" sourceRef="ExclusiveGateway_1c807f0" targetRef="Task_EingangsprozessAnhaengeArchivieren">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${not fehlermeldungVerarbeitungAufrufen}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0v0kcck" sourceRef="Task_EingangsprozessAnhaengeArchivieren" targetRef="ExclusiveGateway_OrdnungstypValide" />
+    <bpmn:sequenceFlow id="SequenceFlow_0waunhn" name="Nein" sourceRef="ExclusiveGateway_OrdnungstypValide" targetRef="ExclusiveGateway_0xs8738">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${not ordnungstypValide}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_07bxq1o" name="Ja" sourceRef="ExclusiveGateway_OrdnungstypValide" targetRef="ExclusiveGateway_OrdnungstypArt">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ordnungstypValide}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_OrdnungstypArtVNR" name="VNR" sourceRef="ExclusiveGateway_OrdnungstypArt" targetRef="Task_EingangsprozessSchadenErfassen">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ordnungstyp == "VNR"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1n8gsgq" sourceRef="Task_EingangsprozessSchadenErfassen" targetRef="Task_EingangsprozessDokumenteZuSnrBekanntgeben" />
+    <bpmn:sequenceFlow id="SequenceFlow_1vumses" sourceRef="BoundaryEvent_0y7b48v" targetRef="ExclusiveGateway_0xs8738" />
+    <bpmn:sequenceFlow id="SequenceFlow_0rs6dzp" sourceRef="BoundaryEvent_FehlerSchadenerfassung" targetRef="Task_EingangsprozessWartendeNachrichtenAnstossenSchadenNichtErfassbar" />
+    <bpmn:sequenceFlow id="SequenceFlow_11pj7vj" sourceRef="Task_EingangsprozessDokumenteZuSnrBekanntgeben" targetRef="ExclusiveGateway_0o0cgz7" />
+    <bpmn:sequenceFlow id="SequenceFlow_0yde6jg" sourceRef="ExclusiveGateway_0o0cgz7" targetRef="Gateway_1pvrayo" />
+    <bpmn:sequenceFlow id="SequenceFlow_1p9no7p" sourceRef="ExclusiveGateway_0xs8738" targetRef="Task_EingangsprozessWartendeNachrichtenAnstossenOrdnungstypNichtValide" />
+    <bpmn:sequenceFlow id="SequenceFlow_1erzzrm" sourceRef="Task_EingangsprozessWartendeNachrichtenAnstossenSchadenNichtErfassbar" targetRef="EndEvent_EingangsprozessSchadenNichtErfassbar" />
+    <bpmn:sequenceFlow id="SequenceFlow_FachlicherVorgangErmitteltNein" name="Nein" sourceRef="ExclusiveGateway_FachlicherVorgangErmittelt" targetRef="ExclusiveGateway_ZusammenNachBekanntgabe">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${fachlicherVorgang == 'POSTKORB'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1c7ityx" sourceRef="Task_EingangsprozessWartendeNachrichtenAnstossenOrdnungstypNichtValide" targetRef="ExclusiveGateway_ZusammenNachBekanntgabe" />
+    <bpmn:sequenceFlow id="SequenceFlow_1m3tjtm" sourceRef="ExclusiveGateway_ZusammenNachBekanntgabe" targetRef="Task_EingangsprozessPostkorbErmitteln" />
+    <bpmn:sequenceFlow id="SequenceFlow_0oylw2h" sourceRef="Task_EingangsprozessPostkorbeintragOderGespraechsnotizErzeugen" targetRef="EndEvent_EingangsprozessPostkorbeintragErstellt" />
+    <bpmn:sequenceFlow id="SequenceFlow_1wfxpkw" sourceRef="Task_EingangsprozessPostkorbErmitteln" targetRef="Task_EingangsprozessPostkorbeintragOderGespraechsnotizErzeugen" />
+    <bpmn:serviceTask id="Task_EingangsprozessMetadatenErmitteln" name="Metadaten ermitteln" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateEingangsprozessMetadatenErmitteln}">
+      <bpmn:documentation>GdvNachrichtenSpeicherung</bpmn:documentation>
+      <bpmn:incoming>SequenceFlow_0o7gfjb</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1hx77go</bpmn:outgoing>
+      <bpmn:property id="Property_03d2bjc" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_1046jw2">
+        <bpmn:sourceRef>DataStoreReference_EinzelnachrichtenArchiv</bpmn:sourceRef>
+        <bpmn:targetRef>Property_03d2bjc</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0b9umxu" sourceRef="Task_EingangsprozessQuittungsverarbeitungAufrufen" targetRef="EndEvent_EingangsprozessQuittungsverarbeitungAufgerufen" />
+    <bpmn:sequenceFlow id="SequenceFlow_0fe61d2" sourceRef="Task_EingangsprozessMailFehlermeldungVerschicken" targetRef="EndEvent_EingangsprozessMailFehlermeldungGesendet" />
+    <bpmn:exclusiveGateway id="Gateway_1pvrayo" name="Schadenstatus 4, 6 oder 9?" default="Flow_0u87q9w">
+      <bpmn:incoming>SequenceFlow_0yde6jg</bpmn:incoming>
+      <bpmn:outgoing>Flow_0u87q9w</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1es5gcl</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0u87q9w" name="Nein" sourceRef="Gateway_1pvrayo" targetRef="Gateway_0hm07z8" />
+    <bpmn:sequenceFlow id="Flow_1es5gcl" name="Ja" sourceRef="Gateway_1pvrayo" targetRef="Task_EingangsprozessBearbeiterauftragErzeugen">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${schadenStatus == '4' || schadenStatus == '6' || schadenStatus == '9'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0k1qx9q" sourceRef="Task_EingangsprozessFachlichenVorgangErmitteln" targetRef="ExclusiveGateway_FachlicherVorgangErmittelt" />
+    <bpmn:sequenceFlow id="SequenceFlow_FachlicherVorgangErmitteltJa" name="Ja" sourceRef="ExclusiveGateway_FachlicherVorgangErmittelt" targetRef="Task_EingangsprozessFachlichenVorgangAufrufen">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${fachlicherVorgang != 'POSTKORB'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_000tl29" sourceRef="Task_EingangsprozessFachlichenVorgangAufrufen" targetRef="EndEvent_EingangsprozessFachlichenVorgangAufgerufen" />
+    <bpmn:sequenceFlow id="Flow_1a2z6hl" sourceRef="Gateway_0hm07z8" targetRef="Task_EingangsprozessFachlichenVorgangErmitteln" />
+    <bpmn:sequenceFlow id="Flow_0qj8cmg" sourceRef="Task_EingangsprozessBearbeiterauftragErzeugen" targetRef="Gateway_0hm07z8" />
+    <bpmn:endEvent id="EndEvent_EingangsprozessSchadenNichtErfassbar" name="Schaden nicht erfassbar" camunda:asyncAfter="true">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="#{listenerVerarbeitungBeendetEingangsprozess}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1erzzrm</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Task_EingangsprozessWartendeNachrichtenAnstossenSchadenNichtErfassbar" name="Wartende Nachrichten anstoßen" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateEingangsprozessWartendeNachrichtenAnstossen}">
+      <bpmn:incoming>SequenceFlow_0rs6dzp</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1erzzrm</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_ZusammenNachBekanntgabe">
+      <bpmn:incoming>SequenceFlow_FachlicherVorgangErmitteltNein</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1c7ityx</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1m3tjtm</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="EndEvent_EingangsprozessPostkorbeintragErstellt" name="Postkorbeintrag erstellt" camunda:asyncAfter="true">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="#{listenerVerarbeitungBeendetEingangsprozess}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0oylw2h</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Task_EingangsprozessPostkorbeintragOderGespraechsnotizErzeugen" name="Postkorb- eintrag oder Gesprächsnotiz erzeugen" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateEingangsprozessPostkorbeintragOderGespraechsnotizErzeugen}">
+      <bpmn:incoming>SequenceFlow_1wfxpkw</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0oylw2h</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:businessRuleTask id="Task_EingangsprozessPostkorbErmitteln" name="Postkorb ermitteln" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:resultVariable="postkorbAussteuernEingangsprozessMap" camunda:decisionRef="eingangsprozessPostkorbErmitteln" camunda:mapDecisionResult="singleResult">
+      <bpmn:incoming>SequenceFlow_1m3tjtm</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1wfxpkw</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:serviceTask id="Task_EingangsprozessWartendeNachrichtenAnstossenOrdnungstypNichtValide" name="Wartende Nachrichten anstoßen" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateEingangsprozessWartendeNachrichtenAnstossen}">
+      <bpmn:incoming>SequenceFlow_1p9no7p</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1c7ityx</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_EingangsprozessQuittungsverarbeitungAufrufen" name="Quittungs-verarbeitung aufrufen" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateEingangsprozessQuittungsverarbeitungAufrufen}">
+      <bpmn:incoming>SequenceFlow_QuittungsverarbeitungAufrufenJa</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0b9umxu</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_EingangsprozessQuittungsverarbeitungAufgerufen" name="Quittungs-verarbeitung aufgerufen" camunda:asyncAfter="true">
+      <bpmn:incoming>SequenceFlow_0b9umxu</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_EingangsprozessMailFehlermeldungGesendet" name="Mail Fehlermeldung gesendet" camunda:asyncAfter="true">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="#{listenerVerarbeitungBeendetEingangsprozess}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0fe61d2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_EingangsprozessNachrichtentypAusgesteuert" name="Nachrichtentyp ausgesteuert" camunda:asyncAfter="true">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="#{listenerVerarbeitungBeendetEingangsprozess}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_NachrichtenTypAussteuernJa</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Task_EingangsprozessMailFehlermeldungVerschicken" name="Mail Fehlermeldung verschicken" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateEingangsprozessMailFehlermeldungVerschicken}">
+      <bpmn:incoming>SequenceFlow_0dd39jy</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0fe61d2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:businessRuleTask id="Task_EingangsprozessFachlichenVorgangErmitteln" name="Fachlichen Vorgang ermitteln" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:resultVariable="fachlicherVorgang" camunda:decisionRef="eingangsprozessFachlichenVorgangErmitteln" camunda:mapDecisionResult="singleEntry">
+      <bpmn:incoming>Flow_1a2z6hl</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0k1qx9q</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_FachlicherVorgangErmittelt" name="Fachlichen Vorgang ermittelt?">
+      <bpmn:incoming>SequenceFlow_0k1qx9q</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_FachlicherVorgangErmitteltJa</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_FachlicherVorgangErmitteltNein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_EingangsprozessFachlichenVorgangAufrufen" name="Fachlichen Vorgang aufrufen" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateEingangsprozessFachlichenVorgangAufrufen}">
+      <bpmn:incoming>SequenceFlow_FachlicherVorgangErmitteltJa</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_000tl29</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_EingangsprozessFachlichenVorgangAufgerufen" name="Fachlichen Vorgang aufgerufen" camunda:asyncAfter="true">
+      <bpmn:incoming>SequenceFlow_000tl29</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_0hm07z8">
+      <bpmn:incoming>Flow_0u87q9w</bpmn:incoming>
+      <bpmn:incoming>Flow_0qj8cmg</bpmn:incoming>
+      <bpmn:outgoing>Flow_1a2z6hl</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="Task_EingangsprozessBearbeiterauftragErzeugen" name="Bearbeiter-auftrag erzeugen" camunda:asyncBefore="true" camunda:asyncAfter="true" calledElement="Process_Bearbeiterauftrag" camunda:variableMappingDelegateExpression="#{delegateProzessVariablenUebergabe}">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1es5gcl</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qj8cmg</bpmn:outgoing>
+    </bpmn:callActivity>
+  </bpmn:process>
+  <bpmn:error id="Error_0uusrs0" name="Error_3olms1g" />
+  <bpmn:error id="Error_1ii2zuq" name="Error_2r460ru" />
+  <bpmn:escalation id="Escalation_1wywuh1" name="Escalation_AnhangKorrupt" escalationCode="AnhangKorrupt" />
+  <bpmn:escalation id="Escalation_1fmunv2" name="Escalation_MindestdatenFehlerhaft" escalationCode="SCHADENMINDESTDATEN_FEHLERHAFT" />
+  <bpmn:escalation id="Escalation_0dznoyv" name="Escalation_KeineSchadenmeldung" escalationCode="KEINE_SCHADENMELDUNG" />
+  <bpmn:escalation id="Escalation_1cuzjcv" name="Escalation_SchadenNichtErfassbar" escalationCode="SCHADEN_NICHT_ERFASSBAR" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_Eingangsprozess">
+      <bpmndi:BPMNShape id="Participant_1uotzlf_di" bpmnElement="Participant_Eingangsprozess" isHorizontal="true">
+        <dc:Bounds x="156" y="80" width="2149" height="780" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0fe61d2_di" bpmnElement="SequenceFlow_0fe61d2">
+        <di:waypoint x="2184" y="580" />
+        <di:waypoint x="2219" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1977" y="741" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0b9umxu_di" bpmnElement="SequenceFlow_0b9umxu">
+        <di:waypoint x="2184" y="683" />
+        <di:waypoint x="2219" y="683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1977" y="850" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1wfxpkw_di" bpmnElement="SequenceFlow_1wfxpkw">
+        <di:waypoint x="2051" y="468" />
+        <di:waypoint x="2084" y="468" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1843" y="517" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0oylw2h_di" bpmnElement="SequenceFlow_0oylw2h">
+        <di:waypoint x="2184" y="468" />
+        <di:waypoint x="2219" y="468" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1977" y="523" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1m3tjtm_di" bpmnElement="SequenceFlow_1m3tjtm">
+        <di:waypoint x="1923" y="468" />
+        <di:waypoint x="1951" y="468" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1712" y="517" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1c7ityx_di" bpmnElement="SequenceFlow_1c7ityx">
+        <di:waypoint x="1837" y="468" />
+        <di:waypoint x="1873" y="468" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1675" y="517" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_05g7et3_di" bpmnElement="SequenceFlow_FachlicherVorgangErmitteltNein">
+        <di:waypoint x="1898" y="180" />
+        <di:waypoint x="1898" y="443" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1905" y="182" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1erzzrm_di" bpmnElement="SequenceFlow_1erzzrm">
+        <di:waypoint x="1837" y="369" />
+        <di:waypoint x="2219" y="369" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1848" y="398" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1p9no7p_di" bpmnElement="SequenceFlow_1p9no7p">
+        <di:waypoint x="1181" y="468" />
+        <di:waypoint x="1737" y="468" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1309" y="517" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0yde6jg_di" bpmnElement="SequenceFlow_0yde6jg">
+        <di:waypoint x="1415" y="155" />
+        <di:waypoint x="1455" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1407" y="138" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_11pj7vj_di" bpmnElement="SequenceFlow_11pj7vj">
+        <di:waypoint x="1370" y="252" />
+        <di:waypoint x="1390" y="252" />
+        <di:waypoint x="1390" y="180" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1291" y="205" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0rs6dzp_di" bpmnElement="SequenceFlow_0rs6dzp">
+        <di:waypoint x="1218" y="310" />
+        <di:waypoint x="1218" y="369" />
+        <di:waypoint x="1737" y="369" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1158" y="408.5" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1vumses_di" bpmnElement="SequenceFlow_1vumses">
+        <di:waypoint x="1156" y="310" />
+        <di:waypoint x="1156" y="443" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1023" y="440" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1n8gsgq_di" bpmnElement="SequenceFlow_1n8gsgq">
+        <di:waypoint x="1236" y="252" />
+        <di:waypoint x="1270" y="252" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1219" y="337" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ivmvs4_di" bpmnElement="SequenceFlow_OrdnungstypArtVNR">
+        <di:waypoint x="1103" y="180" />
+        <di:waypoint x="1103" y="252" />
+        <di:waypoint x="1136" y="252" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1110" y="187" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_07bxq1o_di" bpmnElement="SequenceFlow_07bxq1o">
+        <di:waypoint x="1043" y="155" />
+        <di:waypoint x="1078" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1047" y="137" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0waunhn_di" bpmnElement="SequenceFlow_0waunhn">
+        <di:waypoint x="1018" y="180" />
+        <di:waypoint x="1018" y="468" />
+        <di:waypoint x="1131" y="468" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1025" y="186" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0v0kcck_di" bpmnElement="SequenceFlow_0v0kcck">
+        <di:waypoint x="955" y="155" />
+        <di:waypoint x="993" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="724" y="240" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_12m4tre_di" bpmnElement="SequenceFlow_12m4tre">
+        <di:waypoint x="817" y="155" />
+        <di:waypoint x="855" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="822" y="137" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0dd39jy_di" bpmnElement="SequenceFlow_0dd39jy">
+        <di:waypoint x="792" y="180" />
+        <di:waypoint x="792" y="580" />
+        <di:waypoint x="2084" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="800" y="182" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0kvboss_di" bpmnElement="SequenceFlow_QuittungsverarbeitungAufrufenNein">
+        <di:waypoint x="726" y="155" />
+        <di:waypoint x="767" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="730" y="137" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0kwg5d0_di" bpmnElement="SequenceFlow_QuittungsverarbeitungAufrufenJa">
+        <di:waypoint x="701" y="180" />
+        <di:waypoint x="701" y="683" />
+        <di:waypoint x="2084" y="683" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="708" y="182" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1a9ca4y_di" bpmnElement="SequenceFlow_NachrichtenTypAussteuernNein">
+        <di:waypoint x="633" y="155" />
+        <di:waypoint x="676" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="639" y="137" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1jornob_di" bpmnElement="SequenceFlow_NachrichtenTypAussteuernJa">
+        <di:waypoint x="608" y="180" />
+        <di:waypoint x="608" y="782" />
+        <di:waypoint x="2219" y="782" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="615" y="183" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_108fyfu_di" bpmnElement="SequenceFlow_108fyfu">
+        <di:waypoint x="550" y="155" />
+        <di:waypoint x="583" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="176" y="240" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1hx77go_di" bpmnElement="SequenceFlow_1hx77go">
+        <di:waypoint x="420" y="155" />
+        <di:waypoint x="450" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="5" y="230" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0o7gfjb_di" bpmnElement="SequenceFlow_0o7gfjb">
+        <di:waypoint x="277" y="155" />
+        <di:waypoint x="320" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-181" y="230" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_17162p2_di" bpmnElement="SequenceFlow_OrdnungstypArtSNR">
+        <di:waypoint x="1128" y="155" />
+        <di:waypoint x="1365" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1134" y="137" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0u87q9w_di" bpmnElement="Flow_0u87q9w">
+        <di:waypoint x="1505" y="155" />
+        <di:waypoint x="1655" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1525" y="137" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1es5gcl_di" bpmnElement="Flow_1es5gcl">
+        <di:waypoint x="1480" y="180" />
+        <di:waypoint x="1480" y="252" />
+        <di:waypoint x="1530" y="252" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1489" y="182" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0k1qx9q_di" bpmnElement="SequenceFlow_0k1qx9q">
+        <di:waypoint x="1837" y="155" />
+        <di:waypoint x="1873" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1630" y="148" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0jje29n_di" bpmnElement="SequenceFlow_FachlicherVorgangErmitteltJa">
+        <di:waypoint x="1923" y="155" />
+        <di:waypoint x="2084" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1928" y="137" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_000tl29_di" bpmnElement="SequenceFlow_000tl29">
+        <di:waypoint x="2184" y="155" />
+        <di:waypoint x="2219" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1977" y="148" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1a2z6hl_di" bpmnElement="Flow_1a2z6hl">
+        <di:waypoint x="1705" y="155" />
+        <di:waypoint x="1737" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qj8cmg_di" bpmnElement="Flow_0qj8cmg">
+        <di:waypoint x="1630" y="252" />
+        <di:waypoint x="1680" y="252" />
+        <di:waypoint x="1680" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_1irz42e_di" bpmnElement="StartEvent_Eingangsprozess">
+        <dc:Bounds x="241" y="137" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="217" y="177" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStoreReference_1d4ao39_di" bpmnElement="DataStoreReference_EinzelnachrichtenArchiv">
+        <dc:Bounds x="345" y="227" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="330" y="284" width="81" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BusinessRuleTask_1o9138m_di" bpmnElement="Task_EingangsprozessAussteuerungNachrichtentypPruefen">
+        <dc:Bounds x="450" y="115" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1tx8849_di" bpmnElement="ExclusiveGateway_NachrichtentypAussteuern" isMarkerVisible="true">
+        <dc:Bounds x="583" y="130" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="566" y="102" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_03wxjh5_di" bpmnElement="ExclusiveGateway_QuittungsverarbeitungAufrufen" isMarkerVisible="true">
+        <dc:Bounds x="676" y="130" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="677" y="109" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1c807f0_di" bpmnElement="ExclusiveGateway_1c807f0" isMarkerVisible="true">
+        <dc:Bounds x="767" y="130" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="752" y="109" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CallActivity_1iop1xe_di" bpmnElement="Task_EingangsprozessAnhaengeArchivieren">
+        <dc:Bounds x="855" y="115" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0cgk5m6_di" bpmnElement="ExclusiveGateway_OrdnungstypValide" isMarkerVisible="true">
+        <dc:Bounds x="993" y="130" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="987" y="102" width="64" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_15iryey_di" bpmnElement="ExclusiveGateway_OrdnungstypArt" isMarkerVisible="true">
+        <dc:Bounds x="1078" y="130" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1139" y="259" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CallActivity_0fob2jg_di" bpmnElement="Task_EingangsprozessSchadenErfassen">
+        <dc:Bounds x="1136" y="212" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1cm09pq_di" bpmnElement="Task_EingangsprozessDokumenteZuSnrBekanntgeben">
+        <dc:Bounds x="1270" y="212" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0o0cgz7_di" bpmnElement="ExclusiveGateway_0o0cgz7" isMarkerVisible="true">
+        <dc:Bounds x="1365" y="130" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1276" y="188" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0xs8738_di" bpmnElement="ExclusiveGateway_0xs8738" isMarkerVisible="true">
+        <dc:Bounds x="1131" y="443" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1081" y="567" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_003si6f_di" bpmnElement="Task_EingangsprozessMetadatenErmitteln">
+        <dc:Bounds x="320" y="115" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1pvrayo_di" bpmnElement="Gateway_1pvrayo" isMarkerVisible="true">
+        <dc:Bounds x="1455" y="130" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1442" y="100" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_03lyfch_di" bpmnElement="EndEvent_EingangsprozessSchadenNichtErfassbar">
+        <dc:Bounds x="2219" y="351" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2202" y="391" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_10dpsy7_di" bpmnElement="Task_EingangsprozessWartendeNachrichtenAnstossenSchadenNichtErfassbar">
+        <dc:Bounds x="1737" y="329" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0x6pj5m_di" bpmnElement="ExclusiveGateway_ZusammenNachBekanntgabe" isMarkerVisible="true">
+        <dc:Bounds x="1873" y="443" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1673" y="563" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1gyj2xb_di" bpmnElement="EndEvent_EingangsprozessPostkorbeintragErstellt">
+        <dc:Bounds x="2219" y="450" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2198" y="493" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1uqf1uq_di" bpmnElement="Task_EingangsprozessPostkorbeintragOderGespraechsnotizErzeugen">
+        <dc:Bounds x="2084" y="428" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BusinessRuleTask_1jeolh6_di" bpmnElement="Task_EingangsprozessPostkorbErmitteln">
+        <dc:Bounds x="1951" y="428" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0ffak36_di" bpmnElement="Task_EingangsprozessWartendeNachrichtenAnstossenOrdnungstypNichtValide">
+        <dc:Bounds x="1737" y="428" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_07vph2f_di" bpmnElement="Task_EingangsprozessQuittungsverarbeitungAufrufen">
+        <dc:Bounds x="2084" y="643" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0fgh5u2_di" bpmnElement="EndEvent_EingangsprozessQuittungsverarbeitungAufgerufen">
+        <dc:Bounds x="2219" y="665" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2207" y="708" width="61" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1ox5eev_di" bpmnElement="EndEvent_EingangsprozessMailFehlermeldungGesendet">
+        <dc:Bounds x="2219" y="562" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2200" y="605" width="74" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0kitlcy_di" bpmnElement="EndEvent_EingangsprozessNachrichtentypAusgesteuert">
+        <dc:Bounds x="2219" y="764" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2200" y="807" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0tr12x0_di" bpmnElement="Task_EingangsprozessMailFehlermeldungVerschicken">
+        <dc:Bounds x="2084" y="540" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BusinessRuleTask_186cpwv_di" bpmnElement="Task_EingangsprozessFachlichenVorgangErmitteln">
+        <dc:Bounds x="1737" y="115" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0nb1bdk_di" bpmnElement="ExclusiveGateway_FachlicherVorgangErmittelt" isMarkerVisible="true">
+        <dc:Bounds x="1873" y="130" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1855" y="102" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0eyx4ko_di" bpmnElement="Task_EingangsprozessFachlichenVorgangAufrufen">
+        <dc:Bounds x="2084" y="115" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0dmasb5_di" bpmnElement="EndEvent_EingangsprozessFachlichenVorgangAufgerufen">
+        <dc:Bounds x="2219" y="137" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2210" y="180" width="54" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0hm07z8_di" bpmnElement="Gateway_0hm07z8" isMarkerVisible="true">
+        <dc:Bounds x="1655" y="130" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1wu4rf3_di" bpmnElement="Task_EingangsprozessBearbeiterauftragErzeugen">
+        <dc:Bounds x="1530" y="212" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_07n2x24_di" bpmnElement="BoundaryEvent_FehlerSchadenerfassung">
+        <dc:Bounds x="1200" y="274" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1234" y="306" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_0cd8qgg_di" bpmnElement="BoundaryEvent_0y7b48v">
+        <dc:Bounds x="1138" y="274" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1067" y="306" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="DataInputAssociation_1046jw2_di" bpmnElement="DataInputAssociation_1046jw2">
+        <di:waypoint x="370" y="227" />
+        <di:waypoint x="370" y="195" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

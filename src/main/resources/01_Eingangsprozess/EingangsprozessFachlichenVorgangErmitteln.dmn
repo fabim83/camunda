@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dmn:definitions xmlns:dmn="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <dmn:decision id="eingangsprozessFachlichenVorgangErmitteln" name="Eingangsprozess Fachlichen Vorgang ermitteln" camunda:historyTimeToLive="365">
+    <dmn:decisionTable id="decisionTable" hitPolicy="FIRST">
+      <dmn:input id="InputClause_0403pgo" label="Schadenkennzeichen Automatisierungsstop" camunda:inputVariable="">
+        <dmn:inputExpression id="LiteralExpression_0i3bw1g" typeRef="boolean">
+          <dmn:text>schadenkennzeichenAutomatisierungsstop</dmn:text>
+        </dmn:inputExpression>
+      </dmn:input>
+      <dmn:input id="InputClause_09086lw" label="Bearbeiterauftrag Automatisierungsstop">
+        <dmn:inputExpression id="LiteralExpression_0m6nzdl" typeRef="boolean">
+          <dmn:text>bearbeiterauftragAutomatisierungsstop</dmn:text>
+        </dmn:inputExpression>
+      </dmn:input>
+      <dmn:input id="InputClause_0alwy8b" label="Schaden Status">
+        <dmn:inputExpression id="LiteralExpression_032v996" typeRef="string">
+          <dmn:text>schadenStatus</dmn:text>
+        </dmn:inputExpression>
+      </dmn:input>
+      <dmn:input id="InputClause_1lypq6u" label="Nachrichten-&#10;typ">
+        <dmn:inputExpression id="LiteralExpression_0a37wlm" typeRef="string">
+          <dmn:text>gdvNachrichtentyp</dmn:text>
+        </dmn:inputExpression>
+        <dmn:inputValues id="UnaryTests_06yspfb">
+          <dmn:text>"001","005","015","039"</dmn:text>
+        </dmn:inputValues>
+      </dmn:input>
+      <dmn:input id="InputClause_0b4l707" label="Sachgebiet">
+        <dmn:inputExpression id="LiteralExpression_0nitmy7" typeRef="string">
+          <dmn:text>sachgebiet</dmn:text>
+        </dmn:inputExpression>
+      </dmn:input>
+      <dmn:input id="InputClause_0gdxs1u" label="Absender&#10;Dienstleister" camunda:inputVariable="">
+        <dmn:inputExpression id="LiteralExpression_1n7xvzu" typeRef="string">
+          <dmn:text>absenderDienstleisternummer</dmn:text>
+        </dmn:inputExpression>
+        <dmn:inputValues id="UnaryTests_17tbv45">
+          <dmn:text>"0002","0004","0008","0011","0012","0087","0093"</dmn:text>
+        </dmn:inputValues>
+      </dmn:input>
+      <dmn:input id="InputClause_1exbyht" label="Schadenart">
+        <dmn:inputExpression id="LiteralExpression_1do6xz8" typeRef="integer">
+          <dmn:text>schadenart</dmn:text>
+        </dmn:inputExpression>
+      </dmn:input>
+      <dmn:input id="InputClause_0z61i8r" label="SoPa-Kategorie" camunda:inputVariable="">
+        <dmn:inputExpression id="LiteralExpression_0a13bab" typeRef="string">
+          <dmn:text>absenderSopaHauptKategorie</dmn:text>
+        </dmn:inputExpression>
+      </dmn:input>
+      <dmn:input id="InputClause_1ozmfqy" label="SoPa-Unterkategorie" camunda:inputVariable="">
+        <dmn:inputExpression id="LiteralExpression_13n9mw4" typeRef="string">
+          <dmn:text>absenderSopaUnterKategorie</dmn:text>
+        </dmn:inputExpression>
+      </dmn:input>
+      <dmn:output id="output1" label="Folgevorgang" name="fachlicherVorgang" typeRef="string" />
+      <dmn:rule id="row-921644106-1">
+        <dmn:description>keine Automatisierung gewünscht</dmn:description>
+        <dmn:inputEntry id="UnaryTests_1h5r3hi">
+          <dmn:text>true</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0vujaxe">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_10bsdqp">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0q5hqjw">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0vaeh46">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_122m7q1">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_09glkqg">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1v9mj0m">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1irxrtm">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_1y9ibym">
+          <dmn:text>"POSTKORB"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="DecisionRule_0q3w7fq">
+        <dmn:description>Bearbeiterauftrag keine Automatisierung</dmn:description>
+        <dmn:inputEntry id="UnaryTests_1p05wz6">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_01lfhm5">
+          <dmn:text>true</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_17cznw6">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0x3z4o9">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_109lkas">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0kbcijb">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0w93sfd">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_17il4os">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1mjeup4">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0v77yjj">
+          <dmn:text>"POSTKORB"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="DecisionRule_174b8xt">
+        <dmn:description>Schaden Status 9</dmn:description>
+        <dmn:inputEntry id="UnaryTests_163goyc">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1ha043d">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_06mwv9y">
+          <dmn:text>"4","6","7","9"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0x395k9">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1g48d6u">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0zvto67">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0hjrrol">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_11vdmc1">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0f8n008">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_15jptp7">
+          <dmn:text>"POSTKORB"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-633313524-1">
+        <dmn:description>NT001 Prozess nur für vereinbarte DLP</dmn:description>
+        <dmn:inputEntry id="UnaryTests_0h0lnyl">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0qbn2rt">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_06n8l46">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0yv17xt">
+          <dmn:text>"001"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0ngn7iz">
+          <dmn:text>"K", "H"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1sp1pqi">
+          <dmn:text>"0002", "0004", "0008", "0011", "0012", "0021", "0087", "0093", "004A"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0si4ypz">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1k0eltq">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1kezw5w">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0bwpjaf">
+          <dmn:text>"Message_NT001Prozess"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="DecisionRule_05yirkg">
+        <dmn:description>NT001 Prozess für Glaspartner Junited &amp; Wintec</dmn:description>
+        <dmn:inputEntry id="UnaryTests_0p9xd0l">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0ek4uqp">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_10f9e20">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_06286wy">
+          <dmn:text>"001"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1kh6u1z">
+          <dmn:text>"K"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0bj2c1g">
+          <dmn:text>"0077","0065"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0q4xejg">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1pw0htw">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_08hj7o6">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_1phxoob">
+          <dmn:text>"Message_NT001Prozess"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="DecisionRule_0nrx3ba">
+        <dmn:description>NT001 Prozess Fremdglaser</dmn:description>
+        <dmn:inputEntry id="UnaryTests_1nxn4sp">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0vbf4g5">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_05p94z5">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1jqktyb">
+          <dmn:text>"001"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0v45dnf">
+          <dmn:text>"K"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_001dt06">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0lxj3p1">
+          <dmn:text>74</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0hpka0x">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1wpn256">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_15lfhnr">
+          <dmn:text>"Message_NT001Prozess"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-398087781-1">
+        <dmn:description>GA HSV/VSV</dmn:description>
+        <dmn:inputEntry id="UnaryTests_10az1gt">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0x94ea8">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1idhptt">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0ajlysj">
+          <dmn:text>"005"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0vi304v">
+          <dmn:text>"K", "H"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_041eka8">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0cgq8ba">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0i1yenu">
+          <dmn:text>"SV"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0r7nc5z">
+          <dmn:text>"SH", "SP"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_01ouhgu">
+          <dmn:text>"Message_SvGutachten"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-419623686-7">
+        <dmn:description>GA Fremd-SV</dmn:description>
+        <dmn:inputEntry id="UnaryTests_1gxtqki">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1k7ymcn">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0liffpi">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0ft4ycu">
+          <dmn:text>"005"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0vk5d94">
+          <dmn:text>"K", "H"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0t5gopc">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1yphoqi">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1ut3yvo">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_02n9tnq">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0ykus0h">
+          <dmn:text>"Message_SvGutachten"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="DecisionRule_141q07m">
+        <dmn:description>Rechnung Glas</dmn:description>
+        <dmn:inputEntry id="UnaryTests_0m1jnuq">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0hrmpgs">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1pggjos">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_04c1ddn">
+          <dmn:text>"015"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1lf7y3q">
+          <dmn:text>"K"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1em253z">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_02dl2ow">
+          <dmn:text>74</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_10qluys">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0l6jab2">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_06msgyw">
+          <dmn:text>"Message_NT015Prozess"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-416402079-1">
+        <dmn:description>Rechnung Innovation &amp; Riparo</dmn:description>
+        <dmn:inputEntry id="UnaryTests_0c3tuaw">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1vn7vxd">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_09p83zv">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0v23cqv">
+          <dmn:text>"015"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_10rr2ts">
+          <dmn:text>"K", "H"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0xrb2dp">
+          <dmn:text>"0021","004A"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1c3uweq">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0kogtcu">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_008cs9y">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0uq5sed">
+          <dmn:text>"Message_NT015Prozess"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="DecisionRule_0gcf58i">
+        <dmn:description>Rechnung PWS</dmn:description>
+        <dmn:inputEntry id="UnaryTests_03nu1x8">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1cvfx69">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0jyzgdg">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_00l8bui">
+          <dmn:text>"015"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0p709l7">
+          <dmn:text>"K", "H"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1nzugi3">
+          <dmn:text>"0004","0093"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_01sgupx">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0a347tl">
+          <dmn:text>"WS"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0gr5asz">
+          <dmn:text>"WP"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_1kpbzby">
+          <dmn:text>"Message_NT015Prozess"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-992696953-1">
+        <dmn:description>Mietwagen</dmn:description>
+        <dmn:inputEntry id="UnaryTests_08nfo6l">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_04rcbsx">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_09b1gqd">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1vde5zy">
+          <dmn:text>"016"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1sntl2r">
+          <dmn:text>"K", "H"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1wo3xik">
+          <dmn:text>"0025","0033"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1vu7ue4">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_12bqlgj">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1093sa0">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_15qzv9n">
+          <dmn:text>"Message_Mietwagenrechnung"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="DecisionRule_1wfu4zf">
+        <dmn:description>SV-Gebuehrenabrechnung</dmn:description>
+        <dmn:inputEntry id="UnaryTests_0aisf3w">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1oq9bd0">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0dphejh">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1f4rudt">
+          <dmn:text>"017"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0y5hrvr">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_06dgfh2">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_19ru90z">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1wz9elm">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1hyc25d">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0jfg5xp">
+          <dmn:text>"Message_SvGebuehrenabrechnung"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="DecisionRule_0kmsfgu">
+        <dmn:description>NT018 Innovation / Riparo</dmn:description>
+        <dmn:inputEntry id="UnaryTests_1f54u95">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1aoittl">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1yoeniz">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1eqzinz">
+          <dmn:text>"018"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1w8iowp">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1dfh4nz">
+          <dmn:text>"0021","004A"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0xqoab9">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1l0djtj">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0gtzpa4">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0ck8ftj">
+          <dmn:text>"Message_Leistungsabrechnung"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-416402079-2">
+        <dmn:description>Prüfberichte Eucon</dmn:description>
+        <dmn:inputEntry id="UnaryTests_1r6mowl">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0xqyn98">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1ldzbu4">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0owlyko">
+          <dmn:text>"034"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_06vci3e">
+          <dmn:text>"S","H"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1rsoris">
+          <dmn:text>"0026"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0wfyxt6">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0qi555o">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1adyce4">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_1hbkczn">
+          <dmn:text>"Message_PruefbelegEucon"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-274937681-2">
+        <dmn:description>Prüfberichte CE</dmn:description>
+        <dmn:inputEntry id="UnaryTests_0nuzuwn">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0tvig1l">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_18mo6uy">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0ppaz25">
+          <dmn:text>"039"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_06roadq">
+          <dmn:text>"K","H"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_183s29w">
+          <dmn:text>"0017"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_08013dj">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0rzszee">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_189kzx2">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0fztemp">
+          <dmn:text>"Message_PruefbelegCe"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="DecisionRule_00n34lh">
+        <dmn:description>Eucon Abschlepp-Story</dmn:description>
+        <dmn:inputEntry id="UnaryTests_1g1irwi">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1a41no0">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1bunldh">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0n23n37">
+          <dmn:text>"039"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_125oqku">
+          <dmn:text>"K","H"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_17twv6f">
+          <dmn:text>"0026"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_06lfdbq">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1un389n">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1yiy2ar">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_1aqra69">
+          <dmn:text>"Message_PruefbelegEuconAbschleppstory"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="DecisionRule_1l6s8rs">
+        <dmn:description>Prüfberichte Faircheck/Repair Concepts</dmn:description>
+        <dmn:inputEntry id="UnaryTests_0317udx">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1acis9m">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0a1igtv">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_04xkrt4">
+          <dmn:text>"039"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0dpj1at">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_05xmyp4">
+          <dmn:text>"0054","0078"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0xifurq">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1s9hquu">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_09b5gjt">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_05fm7rk">
+          <dmn:text>"Message_PruefbelegFairdamage"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-890773186-1">
+        <dmn:inputEntry id="UnaryTests_0vkptu4">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_13w6y8g">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0zluk7n">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_16smxzv">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_0pzp7r4">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_1kb7v3d">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_199mxpc">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_154mqg4">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:inputEntry id="UnaryTests_02tasvm">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_1ad2kjp">
+          <dmn:text>"POSTKORB"</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+    </dmn:decisionTable>
+  </dmn:decision>
+</dmn:definitions>

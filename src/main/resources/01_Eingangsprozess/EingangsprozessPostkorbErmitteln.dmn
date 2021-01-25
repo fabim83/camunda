@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions_1ibhjlu" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <decision id="eingangsprozessPostkorbErmitteln" name="Eingangsprozess Postkorb ermitteln" camunda:historyTimeToLive="365">
+    <decisionTable id="decisionTable" hitPolicy="FIRST">
+      <input id="InputClause_0w5llhx" label="Schadenkennzeichen Automatisierungsstop" camunda:inputVariable="">
+        <inputExpression id="LiteralExpression_1agungt" typeRef="boolean">
+          <text>schadenkennzeichenAutomatisierungsstop</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1m199vz" label="Rolle ermittelt?">
+        <inputExpression id="LiteralExpression_1afm8qp" typeRef="boolean">
+          <text>rolleErmittelt</text>
+        </inputExpression>
+      </input>
+      <input id="input1" label="Nachrichtentyp" camunda:inputVariable="">
+        <inputExpression id="inputExpression1" typeRef="string">
+          <text>gdvNachrichtentyp</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_15uqeb9">
+          <text>"NT001","NT005","NT017"</text>
+        </inputValues>
+      </input>
+      <input id="InputClause_1pdduy8" label="Ordnungstyp" camunda:inputVariable="">
+        <inputExpression id="LiteralExpression_157p4wy" typeRef="string">
+          <text>ordnungstyp</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_0qxv6ee">
+          <text>"VNR","SNR","DUMMY_SNR"</text>
+        </inputValues>
+      </input>
+      <output id="output1" label="Postkorb" name="postkorb" typeRef="string">
+        <outputValues id="UnaryTests_1s4gwbj">
+          <text>"SCHADENANLAGE_SDIREKT","SCHADENANLAGE_K",""</text>
+        </outputValues>
+      </output>
+      <output id="OutputClause_12zasbr" label="Prozessart" name="prozessart" typeRef="string">
+        <outputValues id="UnaryTests_0t44hn1">
+          <text>"119","003","116"</text>
+        </outputValues>
+      </output>
+      <rule id="row-921644106-2">
+        <description>keine Automatisierung gewünscht - Standard eWorks Routing</description>
+        <inputEntry id="UnaryTests_1crscaq">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1ui1vp1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_17k97cu">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0rh037y">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0dtxqxk">
+          <text>"EWORKS_ROUTING"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_02xiu47">
+          <text>"129"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0m0o233">
+        <description>Aussteuerung wg. nicht ermittelbarer Rolle</description>
+        <inputEntry id="UnaryTests_11ydowg">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1t44l2g">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1iw1ixf">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_16e86vr">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1rlfhy5">
+          <text>"EWORKS_ROUTING"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_15c6m25">
+          <text>"130"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-478154546-2">
+        <description>Standard eWorks Routing</description>
+        <inputEntry id="UnaryTests_0p7jt5l">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_18k346q">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1tkzzkb">
+          <text>"001"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1dojdhw">
+          <text>"SNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_16j3zho">
+          <text>"EWORKS_ROUTING"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_01pbjj7">
+          <text>"119"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-478154546-4">
+        <description>Team Neuschaden K</description>
+        <inputEntry id="UnaryTests_13o05nx">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_14pvdkw">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1f22kut">
+          <text>"001"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_02rmnlc">
+          <text>"DUMMY_SNR", "VNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0lvf91p">
+          <text>"NEUSCHADEN_KFZ"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1cn6ni8">
+          <text>"003"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-17338041-5">
+        <description>Standard eWorks Routing</description>
+        <inputEntry id="UnaryTests_0rjhetu">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1458t9j">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0pngs36">
+          <text>"005"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1gcu8ct">
+          <text>"SNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0vm7ek3">
+          <text>"EWORKS_ROUTING"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_09ldzj4">
+          <text>"119"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-17338041-9">
+        <description>Team Neuschaden K</description>
+        <inputEntry id="UnaryTests_0r4vsap">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0dgbalh">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0fj5bdf">
+          <text>"005"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1w762xc">
+          <text>"DUMMY_SNR", "VNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0hrfk77">
+          <text>"NEUSCHADEN_KFZ"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_09r94k5">
+          <text>"003"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-97106269-1">
+        <description>Standard eWorks Routing</description>
+        <inputEntry id="UnaryTests_0v5afvg">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1r506kq">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1gkg3aw">
+          <text>"006"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0lj0r2y">
+          <text>"VNR", "SNR", "DUMMY_SNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_177apvd">
+          <text>"EWORKS_ROUTING"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1w2l9um">
+          <text>"116"</text>
+        </outputEntry>
+      </rule>
+      <rule id="table-833615721-1">
+        <description>Standard eWorks Routing</description>
+        <inputEntry id="UnaryTests_1lh3u4r">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0rjhv4m">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1gibl8v">
+          <text>"015"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_00lq15b">
+          <text>"SNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0rq7mky">
+          <text>"EWORKS_ROUTING"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0zlu2ue">
+          <text>"130"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0e3oau3">
+        <description>Team Neuschaden K</description>
+        <inputEntry id="UnaryTests_0usohl8">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0k8hd87">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1dll0m0">
+          <text>"015"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_168y68r">
+          <text>"VNR", "DUMMY_SNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0q0ov4x">
+          <text>"NEUSCHADEN_KFZ"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_09c7njf">
+          <text>"130"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-894771644-3">
+        <description>Standard eWorks Routing</description>
+        <inputEntry id="UnaryTests_04xavtk">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1u8nyhc">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0pi0jy5">
+          <text>"016"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0cp6nmb">
+          <text>"VNR", "SNR", "DUMMY_SNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1azr5mr">
+          <text>"EWORKS_ROUTING"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0xfgouv">
+          <text>"130"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-255329195-1">
+        <description>Standard eWorks Routing</description>
+        <inputEntry id="UnaryTests_188krt8">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_19ky72q">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0f9hwzv">
+          <text>"017"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0tdcj5x">
+          <text>"SNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1soft1h">
+          <text>"EWORKS_ROUTING"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0ed16r6">
+          <text>"119"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-255329195-2">
+        <description>Team Neuschaden K</description>
+        <inputEntry id="UnaryTests_17wkn45">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0s6xeph">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1swr57u">
+          <text>"017"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0kuya1f">
+          <text>"VNR", "DUMMY_SNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_19mlgdz">
+          <text>"NEUSCHADEN_KFZ"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_00p5y1n">
+          <text>"003"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0teclow">
+        <description>Standard eWorks Routing</description>
+        <inputEntry id="UnaryTests_12lr2rk">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0s4mcym">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0l0fbx2">
+          <text>"018"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0zqyuk3">
+          <text>"VNR", "SNR", "DUMMY_SNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1qgymq7">
+          <text>"EWORKS_ROUTING"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1dloyin">
+          <text>"130"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-416402079-4">
+        <description>Standard eWorks Routing</description>
+        <inputEntry id="UnaryTests_05ap2zo">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1xvneez">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1djrbpt">
+          <text>"034"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_024qa39">
+          <text>"VNR", "SNR", "DUMMY_SNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_11ka6cl">
+          <text>"EWORKS_ROUTING"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0x1mhff">
+          <text>"130"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-274937681-4">
+        <description>Standard eWorks Routing</description>
+        <inputEntry id="UnaryTests_1j2o8wl">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_07yxgb4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ytod0b">
+          <text>"039"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1qb8rt2">
+          <text>"VNR", "SNR", "DUMMY_SNR"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0y7eu2d">
+          <text>"EWORKS_ROUTING"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1lkko2r">
+          <text>"130"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-273352716-1">
+        <description>Default-Fall</description>
+        <inputEntry id="UnaryTests_0hfu87y">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0udt3wy">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0rtwiec">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1kksn0k">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_10a7g5h">
+          <text>"AUSSTEUERUNG_CAMUNDA"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0626tzf">
+          <text>"126"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

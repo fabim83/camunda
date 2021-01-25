@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <bpmn:collaboration id="Collaboration_AnhangArchivierung">
+    <bpmn:participant id="Participant_AnhangArchivierung" name="Anhänge archivieren" processRef="Process_AnhaengeArchivieren" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_AnhaengeArchivieren" isExecutable="true" camunda:historyTimeToLive="365">
+    <bpmn:serviceTask id="Task_AnhangArchivierungKorrupteAnhaengeLoeschen" name="Korrupte Anhänge löschen" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateAnhangArchivierungKorrupteAnhaengeLoeschen}">
+      <bpmn:incoming>SequenceFlow_09669oi</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0ge4ywy</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_AnhangArchivierungFehlermailSchreiben" name="Fehlermail schreiben" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateAnhangArchivierungFehlermailSchreiben}">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R0/P2D</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1ms0tdt</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_09669oi</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_AnhangArchivierungKeineAnhaengeVorhanden" name="Keine Anhänge vorhanden" camunda:asyncAfter="true">
+      <bpmn:incoming>SequenceFlow_1e2l1cg</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:subProcess id="SubProcess_KonvertierungAbwarten" name="Konvertierung abwarten" camunda:asyncBefore="true" camunda:asyncAfter="true">
+      <bpmn:incoming>SequenceFlow_0uvk3id</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1l5q4mt</bpmn:outgoing>
+      <bpmn:serviceTask id="Task_AnhangArchivierungArchivierungAnstossen" name="Archivierung anstossen" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateAnhangArchivierungArchivierungAnstossen}">
+        <bpmn:incoming>SequenceFlow_00pczzb</bpmn:incoming>
+        <bpmn:incoming>SequenceFlow_07fbczm</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1ptkb6a</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="EndEvent_AnhangArchivierungAnhangKorrupt" name="Anhang korrupt" camunda:asyncAfter="true">
+        <bpmn:incoming>SequenceFlow_189j7mq</bpmn:incoming>
+        <bpmn:escalationEventDefinition escalationRef="Escalation_00s4aac" />
+      </bpmn:endEvent>
+      <bpmn:intermediateCatchEvent id="IntermediateThrowEvent_Warte_60Sekunden" name="Warte 60 Sekunden">
+        <bpmn:incoming>SequenceFlow_0mdb9mu</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_00pczzb</bpmn:outgoing>
+        <bpmn:timerEventDefinition>
+          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT60S</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:exclusiveGateway id="ExclusiveGateway_KonvertierungAbgeschlossen" name="Ist Konvertierung Abgeschlossen?">
+        <bpmn:incoming>SequenceFlow_1ptkb6a</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_0mdb9mu</bpmn:outgoing>
+        <bpmn:outgoing>SequenceFlow_0gv3kmm</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:boundaryEvent id="BoundaryEvent_EworksFehler" name="Anhang korrupt" attachedToRef="Task_AnhangArchivierungArchivierungAnstossen">
+        <bpmn:outgoing>SequenceFlow_189j7mq</bpmn:outgoing>
+        <bpmn:errorEventDefinition errorRef="Error_1vvj9fz" />
+      </bpmn:boundaryEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_00pczzb" sourceRef="IntermediateThrowEvent_Warte_60Sekunden" targetRef="Task_AnhangArchivierungArchivierungAnstossen" />
+      <bpmn:sequenceFlow id="SequenceFlow_1ptkb6a" sourceRef="Task_AnhangArchivierungArchivierungAnstossen" targetRef="ExclusiveGateway_KonvertierungAbgeschlossen" />
+      <bpmn:sequenceFlow id="SequenceFlow_0mdb9mu" name="Nein" sourceRef="ExclusiveGateway_KonvertierungAbgeschlossen" targetRef="IntermediateThrowEvent_Warte_60Sekunden">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{not konvertierungAbgeschlossen}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="SequenceFlow_189j7mq" sourceRef="BoundaryEvent_EworksFehler" targetRef="EndEvent_AnhangArchivierungAnhangKorrupt" />
+      <bpmn:sequenceFlow id="SequenceFlow_0gv3kmm" name="Ja" sourceRef="ExclusiveGateway_KonvertierungAbgeschlossen" targetRef="EndEvent_AnhangArchivierungKonvertierungErfolgreichBeendet">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{konvertierungAbgeschlossen}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="SequenceFlow_07fbczm" sourceRef="StartEvent_AnhangArchivierungKonvertierungAbwarten" targetRef="Task_AnhangArchivierungArchivierungAnstossen" />
+      <bpmn:startEvent id="StartEvent_AnhangArchivierungKonvertierungAbwarten" name="Start Konvertierung abwarten" camunda:asyncBefore="true">
+        <bpmn:outgoing>SequenceFlow_07fbczm</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:endEvent id="EndEvent_AnhangArchivierungKonvertierungErfolgreichBeendet" name="Konvertierung erfolgreich beendet" camunda:asyncAfter="true">
+        <bpmn:incoming>SequenceFlow_0gv3kmm</bpmn:incoming>
+      </bpmn:endEvent>
+    </bpmn:subProcess>
+    <bpmn:serviceTask id="Task_AnhangArchivierungKonvertierungAnstossen" name="Konvertierung anstossen" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateAnhangArchivierungKonvertierungAnstossen}">
+      <bpmn:incoming>SequenceFlow_1v209fe</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0uvk3id</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_ZusammenKonvertierbar">
+      <bpmn:incoming>SequenceFlow_13u59f0</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1q9d4s3</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0o155qk</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1v209fe</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_AnhaengeKonvertierbar" name="Alle Anhänge konvertierbar?">
+      <bpmn:incoming>SequenceFlow_146dx7s</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0ozkyf3</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1q9d4s3</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_AnhaengeVorhanden" name="Sind Anhänge vorhanden?">
+      <bpmn:incoming>SequenceFlow_1hdblyv</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_146dx7s</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_195q0za</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:startEvent id="StartEvent_AnhangArchivierung" name="Start Anhänge archivieren" camunda:asyncBefore="true">
+      <bpmn:outgoing>SequenceFlow_15amiud</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Task_AnhangArchivierungAnhaengeSpeichern" name="Anhänge speichern" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateAnhangArchivierungAnhaengeSpeichern}">
+      <bpmn:incoming>SequenceFlow_15amiud</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1womald</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_AnhangArchivierungMetadatenErmitteln" name="Metadaten ermitteln" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateAnhangArchivierungMetadatenErmitteln}">
+      <bpmn:incoming>SequenceFlow_1womald</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1hdblyv</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_AnhangArchivierungArchivierungErfolgreichBeendet" name="Archivierung erfolgreich beendet" camunda:asyncAfter="true">
+      <bpmn:incoming>SequenceFlow_1l5q4mt</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Task_AnhangArchivierungIncidentAusloesen" name="Incident auslösen" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateAnhangArchivierungIncidentAusloesen}">
+      <bpmn:incoming>SequenceFlow_1qc0hm3</bpmn:incoming>
+      <bpmn:outgoing>Flow_06mxhb3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_AnhangArchivierungDummyAnhangErstellen" name="Dummy-Anhang erstellen" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{delegateAnhangArchivierungDummyAnhangErstellen}">
+      <bpmn:incoming>SequenceFlow_0ozkyf3</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_13u59f0</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="BoundaryEvent_0td5j4d" attachedToRef="SubProcess_KonvertierungAbwarten">
+      <bpmn:outgoing>SequenceFlow_1ms0tdt</bpmn:outgoing>
+      <bpmn:escalationEventDefinition />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0ge4ywy" sourceRef="Task_AnhangArchivierungKorrupteAnhaengeLoeschen" targetRef="ExclusiveGateway_0v9qgj7" />
+    <bpmn:sequenceFlow id="SequenceFlow_1l5q4mt" sourceRef="SubProcess_KonvertierungAbwarten" targetRef="EndEvent_AnhangArchivierungArchivierungErfolgreichBeendet" />
+    <bpmn:sequenceFlow id="SequenceFlow_1v209fe" sourceRef="ExclusiveGateway_ZusammenKonvertierbar" targetRef="Task_AnhangArchivierungKonvertierungAnstossen" />
+    <bpmn:sequenceFlow id="SequenceFlow_15amiud" sourceRef="StartEvent_AnhangArchivierung" targetRef="Task_AnhangArchivierungAnhaengeSpeichern" />
+    <bpmn:sequenceFlow id="SequenceFlow_1womald" sourceRef="Task_AnhangArchivierungAnhaengeSpeichern" targetRef="Task_AnhangArchivierungMetadatenErmitteln" />
+    <bpmn:sequenceFlow id="SequenceFlow_1hdblyv" sourceRef="Task_AnhangArchivierungMetadatenErmitteln" targetRef="ExclusiveGateway_AnhaengeVorhanden" />
+    <bpmn:sequenceFlow id="SequenceFlow_0ozkyf3" name="Nein" sourceRef="ExclusiveGateway_AnhaengeKonvertierbar" targetRef="Task_AnhangArchivierungDummyAnhangErstellen">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{not alleAnhaengeKonvertierbar}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_146dx7s" name="Ja" sourceRef="ExclusiveGateway_AnhaengeVorhanden" targetRef="ExclusiveGateway_AnhaengeKonvertierbar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{anhaengeVorhanden}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1q9d4s3" name="Ja" sourceRef="ExclusiveGateway_AnhaengeKonvertierbar" targetRef="ExclusiveGateway_ZusammenKonvertierbar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{alleAnhaengeKonvertierbar}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_13u59f0" sourceRef="Task_AnhangArchivierungDummyAnhangErstellen" targetRef="ExclusiveGateway_ZusammenKonvertierbar" />
+    <bpmn:sequenceFlow id="SequenceFlow_1qc0hm3" sourceRef="BoundaryEvent_Warte_30Minuten" targetRef="Task_AnhangArchivierungIncidentAusloesen" />
+    <bpmn:sequenceFlow id="SequenceFlow_1ms0tdt" sourceRef="BoundaryEvent_0td5j4d" targetRef="Task_AnhangArchivierungFehlermailSchreiben" />
+    <bpmn:sequenceFlow id="SequenceFlow_0uvk3id" sourceRef="Task_AnhangArchivierungKonvertierungAnstossen" targetRef="SubProcess_KonvertierungAbwarten" />
+    <bpmn:sequenceFlow id="SequenceFlow_09669oi" sourceRef="Task_AnhangArchivierungFehlermailSchreiben" targetRef="Task_AnhangArchivierungKorrupteAnhaengeLoeschen" />
+    <bpmn:sequenceFlow id="SequenceFlow_195q0za" name="Nein" sourceRef="ExclusiveGateway_AnhaengeVorhanden" targetRef="ExclusiveGateway_0rksnvu">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{not anhaengeVorhanden}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0v9qgj7" name="Sind Anhänge vorhanden?">
+      <bpmn:incoming>SequenceFlow_0ge4ywy</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0o155qk</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0id6jao</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0o155qk" name="Ja" sourceRef="ExclusiveGateway_0v9qgj7" targetRef="ExclusiveGateway_ZusammenKonvertierbar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{anhaengeVorhanden}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0rksnvu">
+      <bpmn:incoming>SequenceFlow_195q0za</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0id6jao</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1e2l1cg</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1e2l1cg" sourceRef="ExclusiveGateway_0rksnvu" targetRef="EndEvent_AnhangArchivierungKeineAnhaengeVorhanden" />
+    <bpmn:sequenceFlow id="SequenceFlow_0id6jao" name="Nein" sourceRef="ExclusiveGateway_0v9qgj7" targetRef="ExclusiveGateway_0rksnvu">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{not anhaengeVorhanden}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:boundaryEvent id="BoundaryEvent_Warte_30Minuten" name="Nach 30 Minuten" attachedToRef="SubProcess_KonvertierungAbwarten">
+      <bpmn:outgoing>SequenceFlow_1qc0hm3</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0zs8rh5">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT30M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_06mxhb3" sourceRef="Task_AnhangArchivierungIncidentAusloesen" targetRef="EndEvent_AnhangArchivierungIncidentAusgeloest" />
+    <bpmn:endEvent id="EndEvent_AnhangArchivierungIncidentAusgeloest" name="Incident ausgelöst" camunda:asyncAfter="true">
+      <bpmn:incoming>Flow_06mxhb3</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:escalation id="Escalation_00s4aac" name="Escalation_AnhangKorrupt" escalationCode="AnhangKorrupt" />
+  <bpmn:error id="Error_1vvj9fz" name="Error_AnhangKorrupt" errorCode="AnhangKorrupt" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_AnhangArchivierung">
+      <bpmndi:BPMNShape id="Participant_0ocohpg_di" bpmnElement="Participant_AnhangArchivierung" isHorizontal="true">
+        <dc:Bounds x="152" y="80" width="1518" height="530" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_AnhangArchivierung">
+        <dc:Bounds x="207" y="227" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="191" y="266" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1a43ikn_di" bpmnElement="ExclusiveGateway_AnhaengeVorhanden" isMarkerVisible="true">
+        <dc:Bounds x="521" y="220" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="511" y="186" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0wm22zd_di" bpmnElement="ExclusiveGateway_AnhaengeKonvertierbar" isMarkerVisible="true">
+        <dc:Bounds x="600" y="220" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="594" y="273" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_146dx7s_di" bpmnElement="SequenceFlow_146dx7s">
+        <di:waypoint x="571" y="245" />
+        <di:waypoint x="600" y="245" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="573" y="224" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ozkyf3_di" bpmnElement="SequenceFlow_0ozkyf3">
+        <di:waypoint x="625" y="220" />
+        <di:waypoint x="625" y="170" />
+        <di:waypoint x="680" y="170" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="594" y="197" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_14c53th_di" bpmnElement="ExclusiveGateway_ZusammenKonvertierbar" isMarkerVisible="true">
+        <dc:Bounds x="818" y="220" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="648" y="410" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_13u59f0_di" bpmnElement="SequenceFlow_13u59f0">
+        <di:waypoint x="780" y="170" />
+        <di:waypoint x="843" y="170" />
+        <di:waypoint x="843" y="220" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="616" y="433" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1q9d4s3_di" bpmnElement="SequenceFlow_1q9d4s3">
+        <di:waypoint x="650" y="245" />
+        <di:waypoint x="818" y="245" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="653" y="224" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0gv1ssj_di" bpmnElement="Task_AnhangArchivierungKonvertierungAnstossen">
+        <dc:Bounds x="914" y="206" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_07eg5ej_di" bpmnElement="Task_AnhangArchivierungAnhaengeSpeichern">
+        <dc:Bounds x="271" y="205" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_07vtdy0_di" bpmnElement="EndEvent_AnhangArchivierungArchivierungErfolgreichBeendet">
+        <dc:Bounds x="1600" y="228" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1589" y="268" width="61" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_189j7mq_di" bpmnElement="SequenceFlow_189j7mq">
+        <di:waypoint x="1220" y="285" />
+        <di:waypoint x="1220" y="330" />
+        <di:waypoint x="1479" y="330" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1011" y="432.5" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_09rimkl_di" bpmnElement="EndEvent_AnhangArchivierungAnhangKorrupt">
+        <dc:Bounds x="1479" y="312" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1461" y="351" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0amkpq4_di" bpmnElement="Task_AnhangArchivierungDummyAnhangErstellen">
+        <dc:Bounds x="680" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_18yry9p_di" bpmnElement="Task_AnhangArchivierungArchivierungAnstossen">
+        <dc:Bounds x="1141" y="187" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_151piwg_di" bpmnElement="ExclusiveGateway_KonvertierungAbgeschlossen" isMarkerVisible="true">
+        <dc:Bounds x="1361" y="202" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1344" y="255" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0mdb9mu_di" bpmnElement="SequenceFlow_0mdb9mu">
+        <di:waypoint x="1386" y="202" />
+        <di:waypoint x="1386" y="154" />
+        <di:waypoint x="1296" y="154" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1393" y="172" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_1ev0wkn_di" bpmnElement="IntermediateThrowEvent_Warte_60Sekunden">
+        <dc:Bounds x="1260" y="136" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1305" y="164" width="50" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_032oqnu_di" bpmnElement="BoundaryEvent_EworksFehler">
+        <dc:Bounds x="1202" y="249" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1231" y="295" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1womald_di" bpmnElement="SequenceFlow_1womald">
+        <di:waypoint x="371" y="245" />
+        <di:waypoint x="396" y="245" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="178.5" y="364" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="SubProcess_0svmklo_di" bpmnElement="SubProcess_KonvertierungAbwarten" isExpanded="true">
+        <dc:Bounds x="1051" y="101" width="496" height="289" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ptkb6a_di" bpmnElement="SequenceFlow_1ptkb6a">
+        <di:waypoint x="1241" y="227" />
+        <di:waypoint x="1361" y="227" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1106" y="332" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_00pczzb_di" bpmnElement="SequenceFlow_00pczzb">
+        <di:waypoint x="1260" y="154" />
+        <di:waypoint x="1191" y="154" />
+        <di:waypoint x="1191" y="187" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1030.5" y="259" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0gv3kmm_di" bpmnElement="SequenceFlow_0gv3kmm">
+        <di:waypoint x="1411" y="227" />
+        <di:waypoint x="1434" y="227" />
+        <di:waypoint x="1434" y="227" />
+        <di:waypoint x="1479" y="227" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1439" y="210" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_07fbczm_di" bpmnElement="SequenceFlow_07fbczm">
+        <di:waypoint x="1107" y="227" />
+        <di:waypoint x="1141" y="227" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="929" y="326" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_18ktu11_di" bpmnElement="StartEvent_AnhangArchivierungKonvertierungAbwarten">
+        <dc:Bounds x="1071" y="209" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1055" y="252" width="69" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1hn2yj0_di" bpmnElement="EndEvent_AnhangArchivierungKonvertierungErfolgreichBeendet">
+        <dc:Bounds x="1479" y="209" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1464" y="249" width="69" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_0o420v4_di" bpmnElement="BoundaryEvent_0td5j4d">
+        <dc:Bounds x="1162" y="372" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1152" y="465" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ms0tdt_di" bpmnElement="SequenceFlow_1ms0tdt">
+        <di:waypoint x="1180" y="408" />
+        <di:waypoint x="1180" y="460" />
+        <di:waypoint x="1140" y="460" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1271" y="588" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1qc0hm3_di" bpmnElement="SequenceFlow_1qc0hm3">
+        <di:waypoint x="1434" y="408" />
+        <di:waypoint x="1434" y="460" />
+        <di:waypoint x="1460" y="460" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1156" y="634.5" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_175vxkm_di" bpmnElement="Task_AnhangArchivierungIncidentAusloesen">
+        <dc:Bounds x="1460" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0uvk3id_di" bpmnElement="SequenceFlow_0uvk3id">
+        <di:waypoint x="1014" y="246" />
+        <di:waypoint x="1051" y="246" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="882.5" y="364" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_15amiud_di" bpmnElement="SequenceFlow_15amiud">
+        <di:waypoint x="243" y="245" />
+        <di:waypoint x="271" y="245" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="97" y="364" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1hdblyv_di" bpmnElement="SequenceFlow_1hdblyv">
+        <di:waypoint x="496" y="245" />
+        <di:waypoint x="521" y="245" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="348.5" y="364" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0ii2wig_di" bpmnElement="Task_AnhangArchivierungMetadatenErmitteln">
+        <dc:Bounds x="396" y="205" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1v209fe_di" bpmnElement="SequenceFlow_1v209fe">
+        <di:waypoint x="867" y="246" />
+        <di:waypoint x="914" y="246" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1l5q4mt_di" bpmnElement="SequenceFlow_1l5q4mt">
+        <di:waypoint x="1547" y="246" />
+        <di:waypoint x="1600" y="246" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_065yjek_di" bpmnElement="Task_AnhangArchivierungFehlermailSchreiben">
+        <dc:Bounds x="1040" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ge4ywy_di" bpmnElement="SequenceFlow_0ge4ywy">
+        <di:waypoint x="914" y="460" />
+        <di:waypoint x="868" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1n6fin1_di" bpmnElement="Task_AnhangArchivierungKorrupteAnhaengeLoeschen">
+        <dc:Bounds x="914" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_09669oi_di" bpmnElement="SequenceFlow_09669oi">
+        <di:waypoint x="1040" y="460" />
+        <di:waypoint x="1014" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1tqfuj6_di" bpmnElement="EndEvent_AnhangArchivierungKeineAnhaengeVorhanden">
+        <dc:Bounds x="1600" y="522" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1581" y="565" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_195q0za_di" bpmnElement="SequenceFlow_195q0za">
+        <di:waypoint x="546" y="270" />
+        <di:waypoint x="546" y="540" />
+        <di:waypoint x="818" y="540" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="551" y="276" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0v9qgj7_di" bpmnElement="ExclusiveGateway_0v9qgj7" isMarkerVisible="true">
+        <dc:Bounds x="818" y="435" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="745" y="446" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0o155qk_di" bpmnElement="SequenceFlow_0o155qk">
+        <di:waypoint x="843" y="435" />
+        <di:waypoint x="843" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="851" y="418" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0rksnvu_di" bpmnElement="ExclusiveGateway_0rksnvu" isMarkerVisible="true">
+        <dc:Bounds x="818" y="515" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1e2l1cg_di" bpmnElement="SequenceFlow_1e2l1cg">
+        <di:waypoint x="868" y="540" />
+        <di:waypoint x="1600" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0id6jao_di" bpmnElement="SequenceFlow_0id6jao">
+        <di:waypoint x="843" y="485" />
+        <di:waypoint x="843" y="515" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="850" y="488" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_067v9c6_di" bpmnElement="BoundaryEvent_Warte_30Minuten">
+        <dc:Bounds x="1416" y="372" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1341" y="415" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1wen0gg_di" bpmnElement="EndEvent_AnhangArchivierungIncidentAusgeloest">
+        <dc:Bounds x="1600" y="442" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1575" y="482" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_06mxhb3_di" bpmnElement="Flow_06mxhb3">
+        <di:waypoint x="1560" y="460" />
+        <di:waypoint x="1600" y="460" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

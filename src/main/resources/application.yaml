@@ -1,0 +1,16 @@
+server:
+  port : 8081
+
+camunda.bpm:
+  filter:
+    create: All tasks
+  authorization:
+    enabled: true
+
+plugin.identity.keycloak:
+  keycloakIssuerUrl: http://localhost:8080/auth/realms/Camunda
+  keycloakAdminUrl: http://localhost:8080/auth/admin/realms/Camunda
+  clientId: camunda-identity-service
+  clientSecret: 4db63194-02df-4b6b-b68d-3d637b7ff902
+  useUsernameAsCamundaUserId: true
+  administratorGroupName: camunda-admin

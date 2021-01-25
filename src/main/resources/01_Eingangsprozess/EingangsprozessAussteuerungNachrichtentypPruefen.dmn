@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dmn:definitions xmlns:dmn="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="3.3.5">
+  <dmn:decision id="eingangsprozessAussteuerungNachrichtentypPruefen" name="Eingangsprozess Aussteuerung Nachrichtentyp prüfen" camunda:historyTimeToLive="365">
+    <dmn:decisionTable id="decisionTable" hitPolicy="FIRST">
+      <dmn:input id="input1" label="" camunda:inputVariable="">
+        <dmn:inputExpression id="inputExpression1" typeRef="string">
+          <dmn:text>gdvNachrichtentyp</dmn:text>
+        </dmn:inputExpression>
+      </dmn:input>
+      <dmn:output id="output1" label="" name="nachrichtenTypAussteuern" typeRef="boolean" />
+      <dmn:rule id="row-478154546-1">
+        <dmn:inputEntry id="UnaryTests_0fn12bu">
+          <dmn:text>"001"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_1t2nxr2">
+          <dmn:text>false</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-355854940-6">
+        <dmn:inputEntry id="UnaryTests_00dujva">
+          <dmn:text>"003"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_15ddjkg">
+          <dmn:text>false</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-355854940-3">
+        <dmn:inputEntry id="UnaryTests_1qgkpva">
+          <dmn:text>"004"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0hrh18i">
+          <dmn:text>false</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-668353140-1">
+        <dmn:inputEntry id="UnaryTests_09230sj">
+          <dmn:text>"005"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0f0v2wq">
+          <dmn:text>false</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-944628639-1">
+        <dmn:inputEntry id="UnaryTests_1wuddpv">
+          <dmn:text>"006"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0xqo3sr">
+          <dmn:text>false</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-352102494-1">
+        <dmn:inputEntry id="UnaryTests_0hwxiaz">
+          <dmn:text>"015"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0s7qqa0">
+          <dmn:text>false</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="DecisionRule_1sf6gqh">
+        <dmn:inputEntry id="UnaryTests_0c9711y">
+          <dmn:text>"016"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0iol02d">
+          <dmn:text>false</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-373017751-1">
+        <dmn:inputEntry id="UnaryTests_1ifg152">
+          <dmn:text>"017"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_1gtnyv6">
+          <dmn:text>false</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="DecisionRule_064wmd5">
+        <dmn:inputEntry id="UnaryTests_18i6aku">
+          <dmn:text>"018"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_0exkj7t">
+          <dmn:text>false</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-416402079-3">
+        <dmn:inputEntry id="UnaryTests_05nfk93">
+          <dmn:text>"034"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_1fhy8wg">
+          <dmn:text>false</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-274937681-1">
+        <dmn:inputEntry id="UnaryTests_036ebh7">
+          <dmn:text>"039"</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_11ozz9b">
+          <dmn:text>false</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+      <dmn:rule id="row-336282595-1">
+        <dmn:inputEntry id="UnaryTests_0s6ge95">
+          <dmn:text></dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="LiteralExpression_07gs925">
+          <dmn:text>true</dmn:text>
+        </dmn:outputEntry>
+      </dmn:rule>
+    </dmn:decisionTable>
+  </dmn:decision>
+</dmn:definitions>
